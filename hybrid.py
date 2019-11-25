@@ -32,7 +32,7 @@ def main():
     test_dataset = pd.read_csv(
         'tcd-ml-1920-group-income-test.csv')
 
-    # Removing Instance Col
+ 
     training_dataset = training_dataset.loc[:, [
         'Year of Record', 'Housing Situation', 'Crime Level in the City of Employement', 'Work Experience in Current Job [years]', 'Satisfation with employer', 'Gender', 'Age', 'Country', 'Size of City', 'Profession', 'University Degree', 'Wears Glasses', 'Hair Color', 'Body Height [cm]', 'Yearly Income in addition to Salary (e.g. Rental Income)', 'Total Yearly Income [EUR]', ]]
     test_dataset = test_dataset.loc[:, ['Year of Record', 'Housing Situation', 'Crime Level in the City of Employement', 'Work Experience in Current Job [years]', 'Satisfation with employer', 'Gender', 'Age',
@@ -45,13 +45,13 @@ def main():
         training_dataset['Yearly Income in addition to Salary (e.g. Rental Income)'], errors='coerce')
     training_dataset['Work Experience in Current Job [years]'] = pd.to_numeric(
         training_dataset['Work Experience in Current Job [years]'], errors='coerce')
-    #training_dataset = training_dataset.replace(np.nan, 0, regex=True)
+    training_dataset = training_dataset.replace(np.nan, 0, regex=True)
     
     test_dataset['Yearly Income in addition to Salary (e.g. Rental Income)'] = pd.to_numeric(
         test_dataset['Yearly Income in addition to Salary (e.g. Rental Income)'], errors='coerce')
     test_dataset['Work Experience in Current Job [years]'] = pd.to_numeric(
         test_dataset['Work Experience in Current Job [years]'], errors='coerce')
-    #test_dataset = test_dataset.replace(np.nan, 0, regex=True)
+    test_dataset = test_dataset.replace(np.nan, 0, regex=True)
 
     training_dataset = training_dataset.drop('Wears Glasses', axis=1)
     test_dataset = test_dataset.drop('Wears Glasses', axis=1)
@@ -60,28 +60,47 @@ def main():
 
     test_dataset[["Year of Record"]] = test_dataset[["Year of Record"]].fillna(value=test_dataset["Year of Record"].mode()[0])
 
-    training_dataset[["Hair Color"]].fillna(value="unknownHC")
+    training_dataset[['Hair Color']] = training_dataset[["Hair Color"]].fillna(value="unknownHC")
     training_dataset[['Hair Color']] = training_dataset[['Hair Color']].replace('0', 'unknownHC') 
     training_dataset[['Hair Color']] = training_dataset[['Hair Color']].replace('Unknown', 'unknownHC')
     training_dataset[['Hair Color']] = training_dataset[['Hair Color']].replace('nan', 'unknownHC')
 
 
-    training_dataset[["Gender"]].fillna(value="unknownG")
+    training_dataset[['Housing Situation']] = training_dataset[['Housing Situation']].fillna(value="unknownHC")
+    training_dataset[['Housing Situation']] = training_dataset[['Housing Situation']].replace('0', 'unknownHS') 
+    training_dataset[['Housing Situation']] = training_dataset[['Housing Situation']].replace(0, 'unknownHS')
+    training_dataset[['Housing Situation']] = training_dataset[['Housing Situation']].replace('nA', 'unknownHS')
+
+
+    training_dataset[["Gender"]] = training_dataset[["Gender"]].fillna(value="unknownG")
     training_dataset[['Gender']] = training_dataset[['Gender']].replace('0', 'unknownG') 
     training_dataset[['Gender']] = training_dataset[['Gender']].replace('unknown', 'unknownG')
+    training_dataset[['Gender']] = training_dataset[['Gender']].replace('f', 'female')
 
     training_dataset[["University Degree"]] = training_dataset[["University Degree"]].fillna(training_dataset["University Degree"].mode()[0])
+    
 
     training_dataset[["Profession"]] = training_dataset[["Profession"]].fillna(value="unknownP")
 
-    training_dataset[['Satisfation with employer']] = training_dataset[['Satisfation with employer']].fillna(training_dataset["Satisfation with employer"].mode()[0])
+
+    training_dataset[['Satisfation with employer']] = training_dataset[['Satisfation with employer']].replace(0, 'unknown')
+    training_dataset[['Satisfation with employer']] = training_dataset[['Satisfation with employer']].fillna('unknown')
+    training_dataset[['Gender']] = training_dataset[['Gender']].replace(0, 'unknownG') 
+    test_dataset[['Satisfation with employer']] = test_dataset[['Satisfation with employer']].replace(0, 'unknown')
+    test_dataset[['Satisfation with employer']] = test_dataset[['Satisfation with employer']].fillna('unknown')
+    test_dataset[['Gender']] = test_dataset[['Gender']].replace(0, 'unknownG') 
 
 
-
-    test_dataset[["Hair Color"]].fillna(value="unknownHC")
+    test_dataset[["Hair Color"]] = test_dataset[["Hair Color"]].fillna(value="unknownHC")
     test_dataset[['Hair Color']] = test_dataset[['Hair Color']].replace('0', 'unknownHC') 
     test_dataset[['Hair Color']] = test_dataset[['Hair Color']].replace('Unknown', 'unknownHC')
     test_dataset[['Hair Color']] = test_dataset[['Hair Color']].replace('nan', 'unknownHC')
+
+    test_dataset[["Housing Situation"]] = test_dataset[['Housing Situation']].fillna(value="unknownHC")
+    test_dataset[['Housing Situation']] = test_dataset[['Housing Situation']].replace('0', 'unknownHS') 
+    test_dataset[['Housing Situation']] = test_dataset[['Housing Situation']].replace(0, 'unknownHS')
+    test_dataset[['Housing Situation']] = test_dataset[['Housing Situation']].replace('nA', 'unknownHS')
+
 
     test_dataset[["University Degree"]] = test_dataset[["University Degree"]].fillna(test_dataset["University Degree"].mode()[0])
 
@@ -90,8 +109,9 @@ def main():
     test_dataset[["Gender"]] = test_dataset[["Gender"]].fillna(value="unknownG")
     test_dataset[['Gender']] = test_dataset[['Gender']].replace('0', 'unknownG') 
     test_dataset[['Gender']] = test_dataset[['Gender']].replace('unknown', 'unknownG')
+    test_dataset[['Gender']] = test_dataset[['Gender']].replace('f', 'female')
 
-    test_dataset[['Satisfation with employer']] = test_dataset[['Satisfation with employer']].fillna(test_dataset["Satisfation with employer"].mode()[0])
+    
     test_dataset[["Country"]] = test_dataset[["Country"]].fillna(test_dataset["Country"].mode()[0])
 
 
@@ -131,10 +151,9 @@ def main():
     test_dataset['Satisfation with employer'] = test_dataset['Satisfation with employer'].map(groupedSWE.set_index('Satisfation with employer')['Total Yearly Income [EUR]'])
     test_dataset['Hair Color'] = test_dataset['Hair Color'].map(groupedHC.set_index('Hair Color')['Total Yearly Income [EUR]'])
 
+    
 
-
-
-    y = training_dataset['Total Yearly Income [EUR]']
+    y = training_dataset['Total Yearly Income [EUR]'].apply(np.log)
     training_dataset = training_dataset.drop("Total Yearly Income [EUR]", 1)
     test_dataset = test_dataset.drop("Total Yearly Income [EUR]", 1)
 
@@ -143,9 +162,8 @@ def main():
         ('scaler', StandardScaler())])
     categorical_transformer = Pipeline(steps=[
         ('imputer', SimpleImputer(strategy='constant', fill_value='missing')),
-        # ('onehot', OneHotEncoder(handle_unknown='ignore'))])
         ('target', TargetEncoder())])
-    # ('weightoe', ce.one_hot.OneHotEncoder())])
+
 
     numeric_features = training_dataset.select_dtypes(
         include=['int64', 'float64']).columns
@@ -179,14 +197,10 @@ def main():
     X_train, X_test, Y_train, Y_test = train_test_split(
         X, Y, test_size=0.2, random_state=0)
 
-    print(X_train.shape)
-    print(Y_train.shape)
-    print(X_test.shape)
-    print(Y_test.shape)
-    reg.fit(X_train, Y_train,
-             regressor__eval_set=(X_test,Y_test),
-             regressor__use_best_model=True,
-             regressor__verbose=True)
+    # reg.fit(X_train, Y_train,
+    #         regressor__eval_set=(X_test,Y_test),
+    #         regressor__use_best_model=True,
+    #         regressor__verbose=True)
     #pre_test_lgb = reg.predict(X_test)
 
     #val_mae = mean_absolute_error(Y_test, pre_test_lgb)
@@ -195,7 +209,7 @@ def main():
     # Kaggle Test
     reg.fit(training_dataset, y.values)
     pred_test = reg.predict(test_dataset)
-   
+    pred_test = np.exp(pred_test)
     
     writeAnswer(pred_test)
 
